@@ -339,6 +339,25 @@ typedef KIFTestStepResult (^KIFTestStepExecutionBlock)(KIFTestStep *step, NSErro
 + (id)stepToEnterText:(NSString *)text intoViewWithAccessibilityLabel:(NSString *)label traits:(UIAccessibilityTraits)traits expectedResult:(NSString *)expectedResult;
 
 /*!
+ @method stepToClearTextInViewWithAccessiblityLabel:
+ @abstract A step that clears any text in a particular view in the view hierarchy.
+ @discussion The view or accessibility element with the given label is searched for in the view hierarchy. If the element isn't found, then the step will attempt to wait until it is. Once the view is present, the text is cleared by sending a setText: message to the view. Fails if the receiving view does not respond to setText:.
+ @param label The accessibility label of the element to clear text in.
+ @result A configured test step.
+ */
++ (id)stepToClearTextInViewWithAccessiblityLabel:(NSString *)label;
+
+/*!
+ @method stepToClearTextInViewWithAccessiblityLabel:
+ @abstract A step that clears any text in a particular view in the view hierarchy.
+ @discussion The view or accessibility element with the given label is searched for in the view hierarchy. If the element isn't found, then the step will attempt to wait until it is. Once the view is present, the text is cleared by sending a setText: message to the view. Fails if the receiving view does not respond to setText:.
+ @param label The accessibility label of the element to clear text in.
+ @param traits The accessibility traits of the element to type into. Elements that do not include at least these traits are ignored.
+ @result A configured test step.
+ */
++ (id)stepToClearTextInViewWithAccessiblityLabel:(NSString *)label traits:(UIAccessibilityTraits)traits;
+
+/*!
  @method stepToSelectPickerViewRowWithTitle:
  @abstract A step that selects an item from a currently visible picker view.
  @discussion With a picker view already visible, this step will find an item with the given title, select that item, and tap the Done button.
