@@ -489,6 +489,37 @@ typedef CGPoint KIFDisplacement;
     }];
 }
 
++ (id)stepToClearTextInViewWithAccessiblityLabel:(NSString *)label;
+{
+    return [self stepToClearTextInViewWithAccessiblityLabel:label traits:UIAccessibilityTraitNone];
+}
+
++ (id)stepToClearTextInViewWithAccessiblityLabel:(NSString *)label traits:(UIAccessibilityTraits)traits;
+{
+    NSString *description = [NSString stringWithFormat:@"Clear the text in view with accessibility label \"%@\"", label];
+    return [self stepWithDescription:description executionBlock:^(KIFTestStep *step, NSError **error) {
+        UIAccessibilityElement *element = [self _accessibilityElementWithLabel:label accessibilityValue:nil tappable:YES traits:traits error:error];
+        if (!element) {
+            return KIFTestStepResultWait;
+        }
+
+        UIView *view = [UIAccessibilityElement viewContainingAccessibilityElement:element];
+        KIFTestWaitCondition(view, error, @"Cannot find view with accessibility label \"%@\"", label);
+
+        KIFTestCondition([view respondsToSelector:@selector(setText:)], error, @"Unable to clear text in view with accessibility label \"%@\": does not respond to setText:", label);
+        [(UITextField *) view setText:@""];
+
+        // This is probably a UITextField- or UITextView-ish view, so make sure it worked
+        if ([view respondsToSelector:@selector(text)]) {
+            // We trim \n and \r because they trigger the return key, so they won't show up in the final product on single-line inputs
+            NSString *actual = [[view performSelector:@selector(text)] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+            KIFTestCondition([actual isEqualToString:@""], error, @"Failed to actually clear text in field; instead, it was \"%@\"", actual);
+        }
+
+        return KIFTestStepResultSuccess;
+    }];
+}
+
 + (id)stepToSelectPickerViewRowWithTitle:(NSString *)title;
 {
     NSString *description = [NSString stringWithFormat:@"Select the \"%@\" item from the picker", title];
