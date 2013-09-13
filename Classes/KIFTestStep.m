@@ -800,7 +800,11 @@ typedef CGPoint KIFDisplacement;
     NSString *description = [NSString stringWithFormat:@"Verify that the first responder is the view with accessibility label '%@'", label];
     return [KIFTestStep stepWithDescription:description executionBlock:^KIFTestStepResult(KIFTestStep *step, NSError *__autoreleasing *error) {
         UIResponder *firstResponder = [[[UIApplication sharedApplication] keyWindow] firstResponder];
-        if ([firstResponder isKindOfClass:NSClassFromString(@"UISearchBarTextField")]) firstResponder = [(UIView *)firstResponder superview];
+        if ([firstResponder isKindOfClass:NSClassFromString(@"UISearchBarTextField")]) {
+            do {
+                firstResponder = [(UIView *)firstResponder superview];
+            } while (firstResponder && ![firstResponder isKindOfClass:[UISearchBar class]]);
+        }
         KIFTestWaitCondition([[firstResponder accessibilityLabel] isEqualToString:label], error, @"Expected accessibility label for first responder to be '%@', got '%@'", label, [firstResponder accessibilityLabel]);
 
         return KIFTestStepResultSuccess;
